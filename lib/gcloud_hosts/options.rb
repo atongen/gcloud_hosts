@@ -1,14 +1,11 @@
 require 'optparse'
-require 'singleton'
 
 module GcloudHosts
   class Options
-    include Singleton
 
     attr_reader :options
 
-    def initialize
-      @parsed = false
+    def initialize(args)
       @options = {
         gcloud: %x{ which gcloud 2>/dev/null }.to_s.strip,
         project: nil,
@@ -16,27 +13,11 @@ module GcloudHosts
         domain: nil,
         public: nil,
         file: '/etc/hosts',
-        dry_run: false
+        backup: nil,
+        dry_run: false,
+        delete: false
       }
-    end
-
-    def parsed?
-      !!@parsed
-    end
-
-    def parse!
-      parser.parse!(ARGV.dup)
-      @parsed = true
-    end
-
-    def self.options
-      parse!
-      instance.options
-    end
-
-    def self.parse!
-      instance.parse! unless instance.parsed?
-      true
+      parser.parse!(args)
     end
 
     private
@@ -51,7 +32,7 @@ module GcloudHosts
           opts.on('-p', '--project PROJECT', "gcloud project to use. Defaults to default gcloud configuration.") do |opt|
             @options[:project] = opt
           end
-          opts.on('-n', '--network', "gcloud network to filter on. Defaults nil.") do |opt|
+          opts.on('-n', '--network NETWORK', "gcloud network to filter on. Defaults nil.") do |opt|
             @options[:network] = opt
           end
           opts.on('-d', '--domain DOMAIN', "Domain to append to all hosts. Default: \"c.[PROJECT].internal\"") do |opt|
@@ -63,8 +44,14 @@ module GcloudHosts
           opts.on('-f', '--file FILE', "Hosts file to update. Defaults to /etc/hosts") do |opt|
             @options[:file] = opt
           end
+          opts.on('-b', '--backup BACKUP', "Path to backup original hosts file to. Defaults to FILE with '.bak' extension appended.") do |opt|
+            @options[:file] = opt
+          end
           opts.on('--[no-]dry-run', "Dry run, don't modify hosts file. Defaults to false") do |opt|
             @options[:dry_run] = opt
+          end
+          opts.on('--[no-]delete', "Delete the project from hosts file. Defaults to false") do |opt|
+            @options[:delete] = opt
           end
           opts.on_tail("--help", "Show this message") do
             puts opts

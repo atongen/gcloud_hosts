@@ -1,4 +1,7 @@
 module GcloudHosts
+  # Updater implements a very state machine which is used to update
+  # content between zero or more blocks of content which start and end
+  # with pre-defined "marker" lines.
   module Updater
 
     module Marker
@@ -7,7 +10,7 @@ module GcloudHosts
       AFTER = 2
     end
 
-    def self.update(new_hosts, project, file, dry_run)
+    def self.update(new_hosts, project, file, backup_file, dry_run, delete)
       start_marker = "# START GCLOUD HOSTS - #{project} #"
       end_marker = "# END GCLOUD HOSTS - #{project} #"
 
@@ -15,13 +18,17 @@ module GcloudHosts
 
       if old_hosts.include?(start_marker) && old_hosts.include?(end_marker)
         # valid markers exists
-        new_content = gen_new_hosts(old_hosts, new_hosts, start_marker, end_marker)
+        if delete
+          new_content = delete_project_hosts(old_hosts, start_marker, end_marker)
+        else
+          new_content = gen_new_hosts(old_hosts, new_hosts, start_marker, end_marker)
+        end
 
         if dry_run
           puts new_content
-        else
+        elsif new_content != old_hosts
           # backup old host file
-          File.open("#{file}.bak", 'w') { |f| f << old_hosts }
+          File.open(backup_file, 'w') { |f| f << old_hosts }
           # write new content
           File.open(file, 'w') { |f| f << new_content }
         end
@@ -29,17 +36,23 @@ module GcloudHosts
         raise UpdaterError.new("Invalid marker present in existing hosts content")
       else
         # marker doesn't exist
-        new_content = [old_hosts, start_marker, new_hosts, end_marker].join("\n")
+        if delete
+          new_content = old_hosts
+        else
+          new_content = [old_hosts, start_marker, new_hosts, end_marker].join("\n")
+        end
 
         if dry_run
           puts new_content
-        else
+        elsif new_content != old_hosts
           # backup old host file
-          File.open("#{file}.bak", 'w') { |f| f << old_hosts }
+          File.open(backup_file, 'w') { |f| f << old_hosts }
           # write new content
           File.open(file, 'w') { |f| f << new_content }
         end
       end
+
+      true
     end
 
     def self.gen_new_hosts(hosts, new_hosts, start_marker, end_marker)
@@ -78,5 +91,36 @@ module GcloudHosts
       end
       new_content
     end
+
+    def self.delete_project_hosts(old_hosts, start_marker, end_marker)
+      new_content = ''
+      marker_state = Marker::BEFORE
+      hosts.split("\n").each do |line|
+        if line == start_marker
+          if marker_state == Marker::BEFORE
+            marker_state = Marker::INSIDE
+            # don't add any content, we're deleting this block
+          else
+            raise UpdaterError.new("Invalid marker state")
+          end
+        elsif line == end_marker
+          if marker_state == Marker::INSIDE
+            marker_state = Marker::AFTER
+          else
+            raise UpdaterError.new("Invalid marker state")
+          end
+        else
+          case marker_state
+          when Marker::BEFORE, Marker::AFTER
+            new_content << line + "\n"
+          when Marker::INSIDE
+            # skip everything between old markers
+            next
+          end
+        end
+      end
+      new_content
+    end
+
   end
 end

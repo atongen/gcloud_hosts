@@ -3,4 +3,4 @@
 lib = File.expand_path('../../lib', __FILE__)
 $LOAD_PATH.unshift(lib) if File.directory?(lib) && !$LOAD_PATH.include?(lib)
 require 'gcloud_hosts'
-GcloudHosts::Runner.new.run!
+GcloudHosts::Runner.new(ARGV.dup).run!

@@ -2,8 +2,9 @@ require 'json'
 
 module GcloudHosts
   class Runner
-    def initialize
-      @options = Options.options
+
+    def initialize(args)
+      @options = Options.new(args).options
     end
 
     def run!
@@ -21,8 +22,15 @@ module GcloudHosts
         domain = "c.#{project}.internal"
       end
 
-      new_hosts_list = Hosts.hosts(@options[:gcloud], project, @options[:network], domain, @options[:public])
-      Updater.update(new_hosts_list.join("\n"), project, @options[:file], @options[:dry_run])
+      backup = @options[:backup] ||
+        @options[:file] + '.bak'
+
+      if @options[:delete]
+        new_hosts_list = []
+      else
+        new_hosts_list = Hosts.hosts(@options[:gcloud], project, @options[:network], domain, @options[:public])
+      end
+      Updater.update(new_hosts_list.join("\n"), project, @options[:file], backup, @options[:dry_run], @options[:delete])
     end
 
     private
