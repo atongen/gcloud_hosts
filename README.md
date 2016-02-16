@@ -2,7 +2,7 @@
 
 Update your hosts file based on gcloud compute instances.
 
-This is handy when used in conjunction with something like sshuttle,
+This is handy when used in conjunction with something like [sshuttle](https://github.com/sshuttle/sshuttle),
 allowing you to have a "poor man's vpn".
 
 ## Installation
@@ -13,7 +13,7 @@ $ gem install gcloud_hosts
 
 ## Requirements
 
-Requires gcloud tool installed and authenticated against at least 1 GCP project.
+Requires [gcloud tool](https://cloud.google.com/sdk/gcloud/) installed and authenticated against at least 1 GCP project.
 
 ## Usage
 
