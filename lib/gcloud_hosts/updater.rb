@@ -92,7 +92,7 @@ module GcloudHosts
       new_content
     end
 
-    def self.delete_project_hosts(old_hosts, start_marker, end_marker)
+    def self.delete_project_hosts(hosts, start_marker, end_marker)
       new_content = ''
       marker_state = Marker::BEFORE
       hosts.split("\n").each do |line|
