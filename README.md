@@ -1,36 +1,55 @@
-# GcloudHosts
+# gcloud_hosts
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/gcloud_hosts`. To experiment with that code, run `bin/console` for an interactive prompt.
+Update your hosts file based on gcloud compute instances.
 
-TODO: Delete this and the text above, and describe your gem
+This is handy when used in conjunction with something like sshuttle,
+allowing you to have a "poor man's vpn".
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'gcloud_hosts'
+```shell
+$ gem install gcloud_hosts
 ```
 
-And then execute:
+## Requirements
 
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install gcloud_hosts
+Requires gcloud tool installed and authenticated against at least 1 GCP project.
 
 ## Usage
 
-TODO: Write usage instructions here
+```shell
+$ gcloud_hosts -h
+Usage: $ gcloud_hosts [options]
+    -g, --gcloud GCLOUD              Path to gcloud executable. Defaults to PATH location
+    -p, --project PROJECT            gcloud project to use. Defaults to default gcloud configuration.
+    -n, --network NETWORK            gcloud network to filter on. Defaults nil.
+    -d, --domain DOMAIN              Domain to append to all hosts. Default: "c.[PROJECT].internal"
+        --public PUBLIC              Pattern to match for public/bastion hosts. Use public IP for these. Defaults to nil
+    -f, --file FILE                  Hosts file to update. Defaults to /etc/hosts
+    -b, --backup BACKUP              Path to backup original hosts file to. Defaults to FILE with '.bak' extension appended.
+        --[no-]dry-run               Dry run, don't modify hosts file. Defaults to false
+        --[no-]delete                Delete the project from hosts file. Defaults to false
+        --help                       Show this message
+        --version                    Show version
+```
 
-## Development
+## Example
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+Start sshuttle session:
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+```shell
+$ sshuttle --remote=bastion01 --daemon --pidfile=/tmp/sshuttle.pid 192.168.1.0/24
+```
+
+Now update your hosts file using gcloud_hosts:
+
+```shell
+$ sudo gcloud_hosts -p my-cool-project --public bastion
+```
+
+Now your hosts file will contain entries for all compute instances in the project,
+and you can ssh directly to them from your local machine.
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/gcloud_hosts.
-
+Bug reports and pull requests are welcome on GitHub at https://github.com/atongen/gcloud_hosts.
