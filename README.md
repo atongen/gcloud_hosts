@@ -27,7 +27,7 @@ Usage: $ gcloud_hosts [options]
         --public PUBLIC              Pattern to match for public/bastion hosts. Use public IP for these. Defaults to nil
     -f, --file FILE                  Hosts file to update. Defaults to /etc/hosts
     -b, --backup BACKUP              Path to backup original hosts file to. Defaults to FILE with '.bak' extension appended.
-        --[no-]dry-run               Dry run, don't modify hosts file. Defaults to false
+        --[no-]dry-run               Dry run, do not modify hosts file. Defaults to false
         --[no-]delete                Delete the project from hosts file. Defaults to false
         --help                       Show this message
         --version                    Show version

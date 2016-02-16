@@ -47,7 +47,7 @@ module GcloudHosts
           opts.on('-b', '--backup BACKUP', "Path to backup original hosts file to. Defaults to FILE with '.bak' extension appended.") do |opt|
             @options[:file] = opt
           end
-          opts.on('--[no-]dry-run', "Dry run, don't modify hosts file. Defaults to false") do |opt|
+          opts.on('--[no-]dry-run', "Dry run, do not modify hosts file. Defaults to false") do |opt|
             @options[:dry_run] = opt
           end
           opts.on('--[no-]delete', "Delete the project from hosts file. Defaults to false") do |opt|
