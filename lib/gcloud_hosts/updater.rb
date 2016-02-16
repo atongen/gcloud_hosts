@@ -23,6 +23,9 @@ module GcloudHosts
         else
           new_content = gen_new_hosts(old_hosts, new_hosts, start_marker, end_marker)
         end
+        # remove zero or more white space characters at end of file with
+        # a single new-line
+        new_content.gsub!(/\s+$/, "\n")
 
         if dry_run
           puts new_content
@@ -41,6 +44,9 @@ module GcloudHosts
         else
           new_content = [old_hosts, start_marker, new_hosts, end_marker].join("\n")
         end
+        # remove one or more white space characters at end of file with
+        # a single new-line
+        new_content.gsub!(/\s+$/, "\n")
 
         if dry_run
           puts new_content
