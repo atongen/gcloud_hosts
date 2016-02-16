@@ -35,21 +35,24 @@ Usage: $ gcloud_hosts [options]
 
 ## Example
 
+Update your hosts file using gcloud_hosts:
+
+```shell
+$ sudo gcloud_hosts -p my-cool-project --public bastion
+
+```
 Start sshuttle session:
 
 ```shell
 $ sshuttle --remote=bastion01 --daemon --pidfile=/tmp/sshuttle.pid 192.168.1.0/24
 ```
 
-Now update your hosts file using gcloud_hosts:
-
-```shell
-$ sudo gcloud_hosts -p my-cool-project --public bastion
-```
-
 Now your hosts file will contain entries for all compute instances in the project,
 and you can ssh directly to them from your local machine.
 
+Hosts matching the pattern passed in with the `--public` flag will have their public
+IP address added to your host file instead of the their private internal IP address.
+
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/atongen/gcloud_hosts.
+Bug reports and pull requests are welcome on GitHub at [https://github.com/atongen/gcloud_hosts](https://github.com/atongen/gcloud_hosts).
