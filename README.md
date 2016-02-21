@@ -25,6 +25,7 @@ Usage: $ gcloud_hosts [options]
     -n, --network NETWORK            gcloud network to filter on. Defaults nil.
     -d, --domain DOMAIN              Domain to append to all hosts. Default: "c.[PROJECT].internal"
         --public PUBLIC              Pattern to match for public/bastion hosts. Use public IP for these. Defaults to nil
+        --[no-]exclude-public        Exclude public hosts from list when updating hosts file. Allows them to be managed manually. Defaults to false
     -f, --file FILE                  Hosts file to update. Defaults to /etc/hosts
     -b, --backup BACKUP              Path to backup original hosts file to. Defaults to FILE with '.bak' extension appended.
         --[no-]dry-run               Dry run, do not modify hosts file. Defaults to false
