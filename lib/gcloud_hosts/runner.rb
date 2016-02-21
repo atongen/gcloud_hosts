@@ -28,7 +28,7 @@ module GcloudHosts
       if @options[:delete]
         new_hosts_list = []
       else
-        new_hosts_list = Hosts.hosts(@options[:gcloud], project, @options[:network], domain, @options[:public])
+        new_hosts_list = Hosts.hosts(@options[:gcloud], project, @options[:network], domain, @options[:public], @options[:exclude_public])
       end
       Updater.update(new_hosts_list.join("\n"), project, @options[:file], backup, @options[:dry_run], @options[:delete])
     end

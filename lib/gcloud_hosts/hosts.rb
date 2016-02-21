@@ -12,18 +12,20 @@ module GcloudHosts
         end.sort { |x,y| x["name"] <=> y["name"] }
     end
 
-    def self.hosts(gcloud_path, project, network, domain, public_pattern)
+    def self.hosts(gcloud_path, project, network, domain, public_pattern, exclude_public)
       instances(gcloud_path, project, network).inject([]) do |list, i|
         begin
           if public_pattern.to_s.strip != "" && i["name"].downcase.include?(public_pattern)
-            # get external ip address
-            i["networkInterfaces"].each do |ni|
-              ni["accessConfigs"].each do |ac|
-                if ac["name"].downcase.include?("nat") && ac["type"].downcase.include?("nat")
-                  if ip = ac["natIP"]
-                    str = "#{ip} #{i["name"]}"
-                    list << str
-                    raise HostError.new
+            if !exclude_public
+              # get external ip address
+              i["networkInterfaces"].each do |ni|
+                ni["accessConfigs"].each do |ac|
+                  if ac["name"].downcase.include?("nat") && ac["type"].downcase.include?("nat")
+                    if ip = ac["natIP"]
+                      str = "#{ip} #{i["name"]}"
+                      list << str
+                      raise HostError.new
+                    end
                   end
                 end
               end

@@ -12,6 +12,7 @@ module GcloudHosts
         network: nil,
         domain: nil,
         public: nil,
+        exclude_public: false,
         file: '/etc/hosts',
         backup: nil,
         dry_run: false,
@@ -40,6 +41,9 @@ module GcloudHosts
           end
           opts.on('--public PUBLIC', "Pattern to match for public/bastion hosts. Use public IP for these. Defaults to nil") do |opt|
             @options[:public] = opt
+          end
+          opts.on('--[no-]exclude-public', "Exclude public hosts from list when updating hosts file. Allows them to be managed manually. Defaults to false") do |opt|
+            @options[:exclude_public] = opt
           end
           opts.on('-f', '--file FILE', "Hosts file to update. Defaults to /etc/hosts") do |opt|
             @options[:file] = opt
