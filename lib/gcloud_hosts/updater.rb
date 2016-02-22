@@ -11,8 +11,8 @@ module GcloudHosts
     end
 
     def self.update(new_hosts, project, file, backup_file, dry_run, delete)
-      start_marker = "# START GCLOUD HOSTS - #{project} #"
-      end_marker = "# END GCLOUD HOSTS - #{project} #"
+      start_marker = get_start_marker(project)
+      end_marker = get_end_marker(project)
 
       old_hosts = File.read(file)
 
@@ -98,6 +98,35 @@ module GcloudHosts
       new_content
     end
 
+    def self.clear(file, backup_file, dry_run)
+      old_hosts = File.read(file)
+      new_content = old_hosts.dup
+
+      markers = old_hosts.each_line.map do |line|
+        regex = "\# (START|END) GCLOUD HOSTS - (.+) \#"
+        if m = line.match(/^#{regex}$/)
+          m[2]
+        end
+      end.compact.uniq
+
+      markers.each do |project|
+        start_marker = get_start_marker(project)
+        end_marker = get_end_marker(project)
+
+        new_content = delete_project_hosts(new_content, start_marker, end_marker)
+      end
+      new_content.gsub!(/\s+$/, "\n")
+
+      if dry_run
+        puts new_content
+      elsif new_content != old_hosts
+        # backup old host file
+        File.open(backup_file, 'w') { |f| f << old_hosts }
+        # write new content
+        File.open(file, 'w') { |f| f << new_content }
+      end
+    end
+
     def self.delete_project_hosts(hosts, start_marker, end_marker)
       new_content = ''
       marker_state = Marker::BEFORE
@@ -126,6 +155,14 @@ module GcloudHosts
         end
       end
       new_content
+    end
+
+    def self.get_start_marker(project)
+      "# START GCLOUD HOSTS - #{project} #"
+    end
+
+    def self.get_end_marker(project)
+      "# END GCLOUD HOSTS - #{project} #"
     end
 
   end

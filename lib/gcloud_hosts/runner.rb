@@ -8,29 +8,39 @@ module GcloudHosts
     end
 
     def run!
-      project = @options[:project]
-      if project.to_s.strip == ""
-        project = env["core"]["project"]
+      project = @options[:project].to_s.strip
+      if @options[:clear]
+        if project != ""
+          raise ArgumentError.new("Cannot specify 'clear' and 'project' at the same time.")
+        end
       end
-      if project.to_s.strip == ""
+      if project == ""
+        project = env["core"]["project"].to_s.strip
+      end
+      if project == ""
         raise AuthError.new("No gcloud project specified.")
-      end
-
-      if @options[:domain]
-        domain = @options[:domain].to_s.strip
-      else
-        domain = "c.#{project}.internal"
       end
 
       backup = @options[:backup] ||
         @options[:file] + '.bak'
 
-      if @options[:delete]
-        new_hosts_list = []
+      if @options[:clear]
+        Updater.clear(@options[:file], backup, @options[:dry_run])
       else
-        new_hosts_list = Hosts.hosts(@options[:gcloud], project, @options[:network], domain, @options[:public], @options[:exclude_public])
+        if @options[:domain]
+          domain = @options[:domain].to_s.strip
+        else
+          domain = "c.#{project}.internal"
+        end
+
+
+        if @options[:delete]
+          new_hosts_list = []
+        else
+          new_hosts_list = Hosts.hosts(@options[:gcloud], project, @options[:network], domain, @options[:public], @options[:exclude_public])
+        end
+        Updater.update(new_hosts_list.join("\n"), project, @options[:file], backup, @options[:dry_run], @options[:delete])
       end
-      Updater.update(new_hosts_list.join("\n"), project, @options[:file], backup, @options[:dry_run], @options[:delete])
     end
 
     private

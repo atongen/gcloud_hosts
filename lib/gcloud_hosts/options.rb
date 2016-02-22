@@ -16,7 +16,8 @@ module GcloudHosts
         file: '/etc/hosts',
         backup: nil,
         dry_run: false,
-        delete: false
+        delete: false,
+        clear: false
       }
       parser.parse!(args)
     end
@@ -56,6 +57,9 @@ module GcloudHosts
           end
           opts.on('--[no-]delete', "Delete the project from hosts file. Defaults to false") do |opt|
             @options[:delete] = opt
+          end
+          opts.on('--[no-]clear', "Clear all gcloud host entries from hosts file. Defaults to false") do |opt|
+            @options[:clear] = opt
           end
           opts.on_tail("--help", "Show this message") do
             puts opts
