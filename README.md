@@ -30,6 +30,7 @@ Usage: $ gcloud_hosts [options]
     -b, --backup BACKUP              Path to backup original hosts file to. Defaults to FILE with '.bak' extension appended.
         --[no-]dry-run               Dry run, do not modify hosts file. Defaults to false
         --[no-]delete                Delete the project from hosts file. Defaults to false
+        --[no-]clear                 Clear all gcloud host entries from hosts file. Defaults to false
         --help                       Show this message
         --version                    Show version
 ```
