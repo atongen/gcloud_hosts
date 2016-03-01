@@ -17,9 +17,6 @@ module GcloudHosts
       if project == ""
         project = env["core"]["project"].to_s.strip
       end
-      if project == ""
-        raise AuthError.new("No gcloud project specified.")
-      end
 
       backup = @options[:backup] ||
         @options[:file] + '.bak'
@@ -27,12 +24,14 @@ module GcloudHosts
       if @options[:clear]
         Updater.clear(@options[:file], backup, @options[:dry_run])
       else
+        if project == ""
+          raise AuthError.new("No gcloud project specified.")
+        end
         if @options[:domain]
           domain = @options[:domain].to_s.strip
         else
           domain = "c.#{project}.internal"
         end
-
 
         if @options[:delete]
           new_hosts_list = []
