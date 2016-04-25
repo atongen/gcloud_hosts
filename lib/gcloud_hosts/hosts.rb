@@ -23,6 +23,7 @@ module GcloudHosts
                   if ac["name"].downcase.include?("nat") && ac["type"].downcase.include?("nat")
                     if ip = ac["natIP"]
                       str = "#{ip} #{i["name"]}"
+                      str << " #{i["name"]}.#{domain}" unless domain.to_s.strip == ""
                       list << str
                       raise HostError.new
                     end
