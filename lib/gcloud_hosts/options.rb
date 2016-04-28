@@ -66,7 +66,7 @@ module GcloudHosts
             exit
           end
           opts.on_tail("--version", "Show version") do
-            puts ::GcloudHosts::VERSION.join('.')
+            puts ::GcloudHosts::VERSION
             exit
           end
         end
